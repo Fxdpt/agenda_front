@@ -20,16 +20,26 @@ export class App extends Component {
         ? "0" + (date.getMonth() + 1)
         : date.getMonth() + 1
     ) + "-" + date.getDate()
-
     axios.get('http://localhost:3000/day/by_date/' + formatedDate)
       .then((res) => {
-        console.log(res)
         this.setState({ currentDayObject: res.data })
-        console.log(this.state.currentDayObject)
       })
       .catch((err) => {
         console.log(err)
       })
+  }
+
+  /**
+   * If day is Friday
+   *  Get all workHours for 4 previous day (from MON to THU)
+   *  Sum Workhours then substract 38.5 to them
+   *    set currentDayObject properties based on startTime 9 and endTime as result of substract
+   *    Post it to database
+   */
+
+  formatTimeDisplay = (isoStringTime) => {
+    const dateTime = new Date(isoStringTime)
+    return ("0"+dateTime.getHours()).slice(-2) + ":" + ("0"+dateTime.getMinutes()).slice(-2)
   }
 
   render() {
@@ -37,9 +47,9 @@ export class App extends Component {
     if (this.state.currentDayObject) {
       const currentDay = this.state.currentDayObject
       currentDayContainer = <div>
-        <p>Début :{currentDay.startTime}</p>
-        <p>Fin : {currentDay.endTime}</p>
-        <p>Repas : {currentDay.lunchTime}</p>
+        <p>Début: {this.formatTimeDisplay(currentDay.startTime)}</p>
+        <p>Fin: {this.formatTimeDisplay(currentDay.endTime)}</p>
+    <p>Repas: {currentDay.lunchTime / 60} heure</p>
       </div>
     }
     return (
